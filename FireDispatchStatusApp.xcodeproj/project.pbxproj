@@ -13,6 +13,14 @@
 		F28B0F032CEDA7D200F8CEA5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F28B0F022CEDA7D200F8CEA5 /* Preview Assets.xcassets */; };
 		F2EE40192CEDAD5F00C87804 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = F2EE40182CEDAD5F00C87804 /* ComposableArchitecture */; };
 		F2EE40272CEDB2CB00C87804 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */; };
+		F2EE402C2CEDBEB500C87804 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE402B2CEDBEB500C87804 /* NetworkError.swift */; };
+		F2EE402E2CEDBEDB00C87804 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE402D2CEDBEDB00C87804 /* HTTPMethod.swift */; };
+		F2EE40302CEDBF0500C87804 /* NetworkRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE402F2CEDBF0500C87804 /* NetworkRequest.swift */; };
+		F2EE40322CEDBF5C00C87804 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE40312CEDBF5C00C87804 /* NetworkService.swift */; };
+		F2EE40342CEDC03E00C87804 /* NetworkBaseURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE40332CEDC03E00C87804 /* NetworkBaseURL.swift */; };
+		F2EE40382CEDC21A00C87804 /* String+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE40372CEDC21A00C87804 /* String+Ex.swift */; };
+		F2EE403B2CEDC2F900C87804 /* FireDispatchListRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE403A2CEDC2F900C87804 /* FireDispatchListRequest.swift */; };
+		F2EE403E2CEDC31A00C87804 /* FireDispatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE403D2CEDC31A00C87804 /* FireDispatchModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +30,15 @@
 		F28B0EFF2CEDA7D200F8CEA5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F28B0F022CEDA7D200F8CEA5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		F2EE402B2CEDBEB500C87804 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		F2EE402D2CEDBEDB00C87804 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		F2EE402F2CEDBF0500C87804 /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
+		F2EE40312CEDBF5C00C87804 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		F2EE40332CEDC03E00C87804 /* NetworkBaseURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkBaseURL.swift; sourceTree = "<group>"; };
+		F2EE40372CEDC21A00C87804 /* String+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ex.swift"; sourceTree = "<group>"; };
+		F2EE403A2CEDC2F900C87804 /* FireDispatchListRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchListRequest.swift; sourceTree = "<group>"; };
+		F2EE403D2CEDC31A00C87804 /* FireDispatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchModel.swift; sourceTree = "<group>"; };
+		F2EE403F2CEDC73200C87804 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +73,9 @@
 		F28B0EFA2CEDA7D000F8CEA5 /* FireDispatchStatusApp */ = {
 			isa = PBXGroup;
 			children = (
+				F2EE403F2CEDC73200C87804 /* Info.plist */,
+				F2EE40362CEDC20E00C87804 /* Extension */,
+				F2EE40292CEDBE2600C87804 /* Service */,
 				F28B0EFB2CEDA7D000F8CEA5 /* FireDispatchStatusAppApp.swift */,
 				F28B0EFD2CEDA7D000F8CEA5 /* ContentView.swift */,
 				F28B0EFF2CEDA7D200F8CEA5 /* Assets.xcassets */,
@@ -70,6 +90,52 @@
 				F28B0F022CEDA7D200F8CEA5 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F2EE40292CEDBE2600C87804 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				F2EE402A2CEDBE2A00C87804 /* Network */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		F2EE402A2CEDBE2A00C87804 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				F2EE40312CEDBF5C00C87804 /* NetworkService.swift */,
+				F2EE402B2CEDBEB500C87804 /* NetworkError.swift */,
+				F2EE40332CEDC03E00C87804 /* NetworkBaseURL.swift */,
+				F2EE402D2CEDBEDB00C87804 /* HTTPMethod.swift */,
+				F2EE40392CEDC2DD00C87804 /* Request */,
+				F2EE403C2CEDC31000C87804 /* Model */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		F2EE40362CEDC20E00C87804 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				F2EE40372CEDC21A00C87804 /* String+Ex.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		F2EE40392CEDC2DD00C87804 /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				F2EE402F2CEDBF0500C87804 /* NetworkRequest.swift */,
+				F2EE403A2CEDC2F900C87804 /* FireDispatchListRequest.swift */,
+			);
+			path = Request;
+			sourceTree = "<group>";
+		};
+		F2EE403C2CEDC31000C87804 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F2EE403D2CEDC31A00C87804 /* FireDispatchModel.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,8 +217,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2EE402E2CEDBEDB00C87804 /* HTTPMethod.swift in Sources */,
+				F2EE40382CEDC21A00C87804 /* String+Ex.swift in Sources */,
+				F2EE403E2CEDC31A00C87804 /* FireDispatchModel.swift in Sources */,
+				F2EE402C2CEDBEB500C87804 /* NetworkError.swift in Sources */,
 				F28B0EFE2CEDA7D000F8CEA5 /* ContentView.swift in Sources */,
 				F28B0EFC2CEDA7D000F8CEA5 /* FireDispatchStatusAppApp.swift in Sources */,
+				F2EE40342CEDC03E00C87804 /* NetworkBaseURL.swift in Sources */,
+				F2EE40322CEDBF5C00C87804 /* NetworkService.swift in Sources */,
+				F2EE40302CEDBF0500C87804 /* NetworkRequest.swift in Sources */,
+				F2EE403B2CEDC2F900C87804 /* FireDispatchListRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,6 +370,7 @@
 				DEVELOPMENT_TEAM = G42AKFB24M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FireDispatchStatusApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -325,6 +400,7 @@
 				DEVELOPMENT_TEAM = G42AKFB24M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FireDispatchStatusApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

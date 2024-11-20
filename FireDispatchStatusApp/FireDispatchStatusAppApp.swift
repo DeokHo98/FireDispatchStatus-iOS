@@ -11,6 +11,7 @@ import SwiftUI
 struct FireDispatchStatusAppApp: App {
     var body: some Scene {
         WindowGroup {
+            ContentView()
         }
     }
 }
