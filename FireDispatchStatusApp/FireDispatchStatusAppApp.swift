@@ -11,6 +11,8 @@ import SwiftUI
 struct FireDispatchStatusAppApp: App {
     var body: some Scene {
         WindowGroup {
+            let aaa = []
+            let bbb = aaa.first!
         }
     }
 }
