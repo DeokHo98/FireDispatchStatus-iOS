@@ -1,0 +1,12 @@
+included:
+  - FireDispatchStatusApp
+
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - force_unwrapping
+
+line_length:
+  warning: 100
+  error: 200

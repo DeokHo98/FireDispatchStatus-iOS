@@ -12,6 +12,7 @@
 		F28B0F002CEDA7D200F8CEA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F28B0EFF2CEDA7D200F8CEA5 /* Assets.xcassets */; };
 		F28B0F032CEDA7D200F8CEA5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F28B0F022CEDA7D200F8CEA5 /* Preview Assets.xcassets */; };
 		F2EE40192CEDAD5F00C87804 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = F2EE40182CEDAD5F00C87804 /* ComposableArchitecture */; };
+		F2EE40272CEDB2CB00C87804 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +21,7 @@
 		F28B0EFD2CEDA7D000F8CEA5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F28B0EFF2CEDA7D200F8CEA5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F28B0F022CEDA7D200F8CEA5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +39,7 @@
 		F28B0EEF2CEDA7D000F8CEA5 = {
 			isa = PBXGroup;
 			children = (
+				F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */,
 				F28B0EFA2CEDA7D000F8CEA5 /* FireDispatchStatusApp */,
 				F28B0EF92CEDA7D000F8CEA5 /* Products */,
 			);
@@ -83,6 +86,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F2EE40252CEDB29A00C87804 /* PBXTargetDependency */,
 			);
 			name = FireDispatchStatusApp;
 			packageProductDependencies = (
@@ -118,6 +122,7 @@
 			mainGroup = F28B0EEF2CEDA7D000F8CEA5;
 			packageReferences = (
 				F2EE40172CEDAD5F00C87804 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				F2EE40232CEDB23300C87804 /* XCRemoteSwiftPackageReference "SwiftLint" */,
 			);
 			productRefGroup = F28B0EF92CEDA7D000F8CEA5 /* Products */;
 			projectDirPath = "";
@@ -133,6 +138,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2EE40272CEDB2CB00C87804 /* .swiftlint.yml in Resources */,
 				F28B0F032CEDA7D200F8CEA5 /* Preview Assets.xcassets in Resources */,
 				F28B0F002CEDA7D200F8CEA5 /* Assets.xcassets in Resources */,
 			);
@@ -151,6 +157,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F2EE40252CEDB29A00C87804 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F2EE40242CEDB29A00C87804 /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		F28B0F042CEDA7D200F8CEA5 /* Debug */ = {
@@ -362,6 +375,14 @@
 				minimumVersion = 1.16.1;
 			};
 		};
+		F2EE40232CEDB23300C87804 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.57.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -369,6 +390,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F2EE40172CEDAD5F00C87804 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
+		};
+		F2EE40242CEDB29A00C87804 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F2EE40232CEDB23300C87804 /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
