@@ -17,17 +17,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install SwiftLint
-        run: |
-          brew install swiftlint
-
-      - name: Run SwiftLint
-        run: |
-          swiftlint lint --strict --config .swiftlint.yml
+      - name: SwiftLint
+        uses: norio-nomura/action-swiftlint@3.2.1
+        with:
+          config-path: .swiftlint.yml
 
   build:
     name: Build and Test
     runs-on: macos-latest
+    needs: lint
     
     steps:
       - name: Checkout code
@@ -36,8 +34,14 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '15.0'
 
       - name: Build
         run: |
-          xcodebuild clean build -project FireDispatchStatusApp.xcodeproj -scheme FireDispatchStatusApp -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 15 Pro" CODE_SIGNING_REQUIRED=NO
+          xcodebuild clean build \
+            -project FireDispatchStatusApp.xcodeproj \
+            -scheme FireDispatchStatusApp \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,name=iPhone 15 Pro" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
