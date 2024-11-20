@@ -2,11 +2,10 @@ name: PR-Validation
 
 on:
   pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'FireDispatchStatusApp/**'
-      - '.github/workflows/**'
-      - '.swiftlint.yml'
+    types: [opened, synchronize, reopened]
+    branches: 
+      - main
+      - develop
 
 jobs:
   lint:
