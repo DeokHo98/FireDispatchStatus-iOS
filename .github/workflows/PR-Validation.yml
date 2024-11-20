@@ -1,0 +1,56 @@
+name: PR-Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'FireDispatchStatusApp/**'
+      - '.github/workflows/**'
+
+jobs:
+  lint:
+    name: SwiftLint
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: |
+          brew install swiftlint
+
+      - name: Create SwiftLint config
+        run: |
+          cat > .swiftlint.yml << 'EOL'
+          included:
+            - FireDispatchStatusApp
+          disabled_rules:
+            - trailing_whitespace
+          opt_in_rules:
+            - force_unwrapping
+          line_length:
+            warning: 100
+            error: 200
+          EOL
+
+      - name: Run SwiftLint
+        run: |
+          swiftlint lint --config .swiftlint.yml --reporter github-actions-logging
+
+  build:
+    name: Build and Test
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build
+        run: |
+          xcodebuild clean build -project FireDispatchStatusApp.xcodeproj -scheme FireDispatchStatusApp -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14 Pro" CODE_SIGNING_REQUIRED=NO
