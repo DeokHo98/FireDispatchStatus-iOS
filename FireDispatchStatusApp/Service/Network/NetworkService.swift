@@ -70,5 +70,4 @@ final class NetworkService: NetworkServiceDependency {
             throw NetworkError.serverError(httpResponse.statusCode)
         }
     }
-    
 }

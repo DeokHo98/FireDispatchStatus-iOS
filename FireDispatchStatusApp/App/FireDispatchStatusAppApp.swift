@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct FireDispatchStatusAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            let store = Store(initialState: FireDispatchFeature.State()) {
+                FireDispatchFeature()
+            }
+            FireDispatchView(store: store)
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FireDispatchModel: Codable {
+struct FireDispatchModel: Codable, Equatable {
     var deadNum: Int
     var date: String
     var state: String
