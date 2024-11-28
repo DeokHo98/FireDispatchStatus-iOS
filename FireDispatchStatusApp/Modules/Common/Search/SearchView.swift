@@ -28,7 +28,7 @@ struct SearchView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.background.opacity(0.6))
+                .fill(Color.appBackground.opacity(0.6))
         )
         .padding(.horizontal, 16)
     }
