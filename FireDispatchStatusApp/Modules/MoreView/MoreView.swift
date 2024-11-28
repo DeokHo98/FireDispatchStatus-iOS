@@ -15,57 +15,61 @@ struct MoreView: View {
     @State private var showAlert = false
     
     var body: some View {
-        ZStack {
-            Color.appTheme
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 10) {
-                makeSection(title: "피드백", content: {
-                    Button(action: {
-                        if isMailAvailable {
-                            isShowingMailView = true
-                        } else {
-                            showAlert = true
-                        }
-                    }, label: {
-                        makeSectionButtonContent(
-                            leadingImage: "pencil",
-                            title: "피드백 보내기",
-                            trailingImage: "chevron.right"
-                        )
-                    })
-                })
-                makeSection(title: "정보", content: {
-                    HStack {
-                        if let appVersion = Bundle.main.infoDictionary?[
-                            "CFBundleShortVersionString"
-                        ] as? String {
+        NavigationStack {
+            ZStack {
+                Color.appTheme
+                    .ignoresSafeArea()
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    makeSection(title: "피드백", content: {
+                        Button(action: {
+                            if isMailAvailable {
+                                isShowingMailView = true
+                            } else {
+                                showAlert = true
+                            }
+                        }, label: {
                             makeSectionButtonContent(
-                                leadingImage: "tag",
-                                title: "앱 버전",
-                                trailingContent: Text(appVersion)
+                                leadingImage: "pencil",
+                                title: "피드백 보내기",
+                                trailingImage: "chevron.right"
                             )
+                        })
+                    })
+                    makeSection(title: "정보", content: {
+                        HStack {
+                            if let appVersion = Bundle.main.infoDictionary?[
+                                "CFBundleShortVersionString"
+                            ] as? String {
+                                makeSectionButtonContent(
+                                    leadingImage: "tag",
+                                    title: "앱 버전",
+                                    trailingContent: Text(appVersion)
+                                )
+                            }
                         }
-                    }
-                })
-                Spacer()
+                    })
+                    Spacer()
+                }
+                .padding(.vertical)
             }
+            .sheet(isPresented: $isShowingMailView) {
+                MailView(
+                    isShowing: $isShowingMailView,
+                    subject: "[피드백 이메일]",
+                    recipients: ["aoao1216@naver.com"]
+                )
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text("스마트폰에 메일이 설정되어 있지 않습니다."),
+                    message: Text("기기의 Mail 앱에서 이메일 계정을 추가할 수 있습니다."),
+                    dismissButton: .default(Text("확인"))
+                )
+            }
+            .navigationTitle("더보기")
+            .navigationBarTitleDisplayMode(.large)
         }
-        .sheet(isPresented: $isShowingMailView) {
-            MailView(
-                isShowing: $isShowingMailView,
-                subject: "[피드백 이메일]",
-                recipients: ["aoao1216@naver.com"]
-            )
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("스마트폰에 메일이 설정되어 있지 않습니다."),
-                message: Text("기기의 Mail 앱에서 이메일 계정을 추가할 수 있습니다."),
-                dismissButton: .default(Text("확인"))
-            )
-        }
-        .padding(.vertical)
     }
     
     private func makeSection<Content: View>(
