@@ -10,7 +10,7 @@ import SwiftUI
 struct FireDispatchHeaderView: View {
     
     @State private var isExpanded = true
-    let state: FireDispatchHeaderFeature.State
+    let state: FireDispatchHeaderState
     
     var body: some View {
         VStack {

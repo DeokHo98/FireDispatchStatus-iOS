@@ -5,79 +5,87 @@
 //  Created by Jeong Deokho on 11/27/24.
 //
 
-import ComposableArchitecture
 import SwiftUI
+import Combine
 
-@Reducer
+@MainActor
 struct FilterFeature {
-    @ObservableState
-    struct State: Equatable {
-        var viewType: ViewType
-        var menuItems: [String] = []
-        let regionItems = [
-            "전체", "서울", "광주", "부산", "대구", "인천", "울산", "세종", "경기",
-            "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
-        ]
-        let stateItems = [
-            "전체", "화재접수", "화재출동",
-            "현장도착", "귀소", "잔불감시"
-        ]
-        var regionSelectedOption = "전체"
-        var stateSelectedOption = "전체"
+    
+    private var swiftDataManager: SwiftDataManager<PushData>?
+    
+    init(
+        filters: [FilterType],
+        swiftDataManager: SwiftDataManager<PushData>? = nil
+    ) {
+        if let swiftDataManager {
+            self.swiftDataManager = swiftDataManager
+        } else {
+            self.swiftDataManager = try? SwiftDataManager<PushData>()
+        }
+        if let pushData = try? self.swiftDataManager?.get(), !pushData.centerName.isEmpty {
+            self.state = State(filters: filters, pushFilterButtonText: pushData.centerName)
+        } else {
+            self.state = State(filters: filters)
+        }
+    }
+    
+    private(set) var state: State
+    private(set) var delegatePublisher = PassthroughSubject<Delegate, Never>()
+    
+    @Observable
+    final class State {
+        var filters: [FilterType]
+        var selectedItems: [FilterType: String]
+        var pushFilterButtonText: String
+        var isSelectedPushFilterButton = false
         
-        var regionImageColor: Color {
-            regionSelectedOption == "전체" ? .appText : .appBackground
-        }
-        var stateImageColor: Color {
-            stateSelectedOption == "전체" ? .appText : .appBackground
-        }
-        
-        var regionTextColor: Color {
-            regionSelectedOption == "전체" ? .appText : .appBackground
-        }
-        var stateTextColor: Color {
-            stateSelectedOption == "전체" ? .appText : .appBackground
-        }
-        
-        var regionBackgroundColor: Color {
-            regionSelectedOption == "전체" ? .appBackground : .appText
-        }
-        var stateBackgroundColor: Color {
-            stateSelectedOption == "전체" ? .appBackground : .appText
+        func labelText(filter: FilterType) -> String {
+            let selectedItem = selectedItems[filter] ?? "전체"
+            return "\(filter.rawValue): \(selectedItem)"
         }
         
-        init(viewType: ViewType) {
-            self.viewType = viewType
-            if viewType == .fireDispatchView {
-                self.menuItems = ["지역", "상태"]
-            } else {
-                self.menuItems = ["지역"]
-            }
+        func defaultColor(filter: FilterType) -> Color {
+            let selected = selectedItems[filter] ?? "전체"
+            return selected == "전체" ? .appText : .appBackground
+        }
+        
+        func backgroundColor(filter: FilterType) -> Color {
+            let selected = selectedItems[filter] ?? "전체"
+            return selected == "전체" ? .appBackground : .appText
+        }
+        
+        init(filters: [FilterType], pushFilterButtonText: String = "") {
+            self.filters = filters
+            self.selectedItems = Dictionary(
+                uniqueKeysWithValues: filters.map { ($0, "전체") }
+            )
+            self.pushFilterButtonText = pushFilterButtonText
         }
     }
     
     enum Action {
-        case regionOptionSelected(String)
-        case stateOptionSelected(String)
-        case delegate(Delegate)
+        case selectedFilter(filterType: FilterType, selectedItem: String)
+        case pushFilterButtonTap
     }
     
-    var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            switch action {
-            case .regionOptionSelected(let option):
-                state.regionSelectedOption = option
-                return .run { send in
-                    await send(.delegate(.selectedOption))
-                }
-            case .stateOptionSelected(let option):
-                state.stateSelectedOption = option
-                return .run { send in
-                    await send(.delegate(.selectedOption))
-                }
-            case .delegate:
-                return .none
+    func send(_ action: Action) {
+        switch action {
+        case .selectedFilter(let filterType, let selectedItem):
+            state.selectedItems[filterType] = selectedItem
+            delegatePublisher.send(
+                .selectedOption(filterType: filterType, selectedItem: selectedItem)
+            )
+        case .pushFilterButtonTap:
+            guard let pushData = try? swiftDataManager?.get(),
+                  pushData.centerName != "" else {
+                return
             }
+            state.isSelectedPushFilterButton.toggle()
+            delegatePublisher.send(
+                .selectedPushFilterButton(
+                    state.isSelectedPushFilterButton ? pushData.centerName : ""
+                )
+            )
         }
     }
 }
@@ -86,15 +94,7 @@ struct FilterFeature {
 
 extension FilterFeature {
     enum Delegate {
-        case selectedOption
-    }
-}
-
-// MARK: - FilterType
-
-extension FilterFeature {
-    enum ViewType {
-        case fireDispatchView
-        case pushSettingView
+        case selectedOption(filterType: FilterType, selectedItem: String)
+        case selectedPushFilterButton(String)
     }
 }

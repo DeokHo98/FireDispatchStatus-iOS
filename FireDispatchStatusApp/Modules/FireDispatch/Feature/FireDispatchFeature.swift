@@ -5,105 +5,152 @@
 //  Created by Jeong Deokho on 11/21/24.
 //
 
-import ComposableArchitecture
 import Foundation
+import Combine
 
-@Reducer
-struct FireDispatchFeature {
-    @ObservableState
-    struct State: Equatable {
-        @Presents var alertState: AlertState<Alert>?
+@MainActor
+final class FireDispatchFeature {
+
+    private let networkService: NetworkServiceDependency
+    
+    init(
+        networkService: NetworkServiceDependency = NetworkService()
+    ) {
+        self.networkService = networkService
+        sinkSearchDelegate()
+        sinkFilterDelegate()
+        sinkObserver()
+    }
+    
+    private(set) var state = State()
+    private var cancellables = Set<AnyCancellable>()
+    private(set) var searchFeature = SearchFeature()
+    private(set) var filterFeature = FilterFeature(filters: [.region, .state])
+  
+    @Observable
+    final class State {
         var originList: [FireDispatchModel] = []
-        var stateEndCount = 0
-        var stateInProgressCount = 0
-        var deadNum = 0
-        var injuredNum = 0
+        var alertState = AlertModel()
         var list: [FireDispatchModel] = []
-        var searchState = SearchFeature.State()
-        var headerState: FireDispatchHeaderFeature.State?
-        var filterState = FilterFeature.State(viewType: .fireDispatchView)
+        var searchText = ""
+        var pushOnCenter = ""
+        var stateFilterItem = "전체"
+        var regionFilterItem = "전체"
+        var headerState: FireDispatchHeaderState?
+        var scrollToRow: String = ""
+        var mapState: MapFeature.State?
     }
     
     enum Action {
-        case fetchFireDispatchList
-        case fetchFireDispatchListResponse(Result<[FireDispatchModel], Error>)
-        case alertAction(PresentationAction<Alert>)
-        case searchAction(SearchFeature.Action)
-        case filterAction(FilterFeature.Action)
-        case refreshButtonTap
+        case fetchList
+        case dismissAlert
+        case pushNotificationTap(String)
+        case didSelectedRow(FireDispatchModel)
+        case dismissMapFeature
     }
     
-    var body: some ReducerOf<Self> {
-        Scope(state: \.searchState, action: \.searchAction) {
-            SearchFeature()
-        }
-        Scope(state: \.filterState, action: \.filterAction) {
-            FilterFeature()
-        }
-        Reduce { state, action in
-            switch action {
-            case .fetchFireDispatchList:
-                return .run { send in
-                    do {
-                        let service = NetworkService()
-                        let list: [FireDispatchModel] = try await service.request(
-                            FireDispatchListRequest()
-                        )
-                        await send(.fetchFireDispatchListResponse(.success(list)))
-                    } catch {
-                        await send(.fetchFireDispatchListResponse(.failure(error)))
-                    }
+    func send(_ action: Action) {
+        switch action {
+        case .fetchList:
+            Task {
+                do {
+                    let list: [FireDispatchModel] = try await networkService.request(
+                        FireDispatchListRequest()
+                    )
+                    fetchListSuccess(list: list)
+                } catch {
+                    fetchListFail(error: error)
                 }
-            case .fetchFireDispatchListResponse(.success(let list)):
-                state.originList = list
-                state.list = self.filteredList(state: &state)
-                return .none
-            case .fetchFireDispatchListResponse(.failure(let error)):
-                let title = "에러가 발생했습니다. 다시 시도해주세요.\n"
-                let errorMessage = error.localizedDescription
-                state.alertState = .onlyOkButtonAlert(title: title + errorMessage)
-                return .none
-            case .alertAction(.dismiss):
-                state.alertState = nil
-                return .none
-            case .searchAction(.delegate(.textFeildEditing)):
-                state.list = self.filteredList(state: &state)
-                return .none
-            case .refreshButtonTap:
-                return .run { send in
-                    await send(.fetchFireDispatchList)
-                }
-            case .filterAction(.delegate(.selectedOption)):
-                state.list = self.filteredList(state: &state)
-                return .none
-            case .alertAction:
-                return .none
-            case .searchAction:
-                return .none
-            case .filterAction:
-                return .none
             }
+        case .dismissAlert:
+            state.alertState = AlertModel()
+        case .pushNotificationTap(let sidoOvrNum):
+            state.scrollToRow = sidoOvrNum
+        case .didSelectedRow(let model):
+            state.mapState = MapFeature.State(fireDispatchModel: model)
+        case .dismissMapFeature:
+            state.mapState = nil
         }
     }
 }
 
-// MARK: - Alert
+// MARK: - Delegate
 
 extension FireDispatchFeature {
-    enum Alert: Equatable {
-        case defaultMessage
+    private func sinkSearchDelegate() {
+        self.searchFeature.delegatePublisher
+            .sink { [weak self] action in
+                self?.searchDelegateSend(action)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func searchDelegateSend(_ action: SearchFeature.Delegate) {
+        switch action {
+        case .textFiledEditing(let text):
+            state.searchText = text
+            setFilteredList()
+        }
+    }
+    
+    private func sinkFilterDelegate() {
+        self.filterFeature.delegatePublisher
+            .sink { [weak self] action in
+                self?.filterDelegateSend(action)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func filterDelegateSend(_ action: FilterFeature.Delegate) {
+        switch action {
+        case .selectedOption(let filterType, let selectedItem):
+            switch filterType {
+            case .region:
+                state.regionFilterItem = selectedItem
+            case .state:
+                state.stateFilterItem = selectedItem
+            }
+        case .selectedPushFilterButton(let pushOnCenter):
+            state.pushOnCenter = pushOnCenter
+        }
+        setFilteredList()
+    }
+}
+
+// MARK: - Notification Center
+
+extension FireDispatchFeature {
+    private func sinkObserver() {
+        NotificationCenter.default.publisher(for: .fireDispatchPushTap)
+            .sink { [weak self] notification in
+                guard let sidoOvrNum = notification.object as? String else { return }
+                self?.send(.pushNotificationTap(sidoOvrNum))
+            }
+            .store(in: &cancellables)
     }
 }
 
 // MARK: - Helper Function
 
 extension FireDispatchFeature {
-    private func filteredList(state: inout State) -> [FireDispatchModel] {
-        var list = state.originList
+    private func fetchListSuccess(list: [FireDispatchModel]) {
+        state.originList = list
+        setHeaderState()
+        setFilteredList()
+    }
+    
+    private func fetchListFail(error: Error) {
+        let title = "에러가 발생했습니다. 다시 시도해주세요.\n"
+        let errorMeessage = error.localizedDescription
+        state.alertState = AlertModel(isShow: true, title: title + errorMeessage)
+    }
+    
+    private func setHeaderState() {
         var stateEndListCount = 0
         var deadNum = 0
         var injuredNum = 0
-        list.forEach {
+        let originList = state.originList
+        originList.forEach {
             if $0.state.contains("귀소") || $0.state.contains("오인") || $0.state.contains("잔불") {
                 stateEndListCount += 1
             }
@@ -111,21 +158,28 @@ extension FireDispatchFeature {
             injuredNum += $0.injuryNum
         }
         state.headerState = .init(
-            totalCount: list.count,
-            inProgressCount: list.count - stateEndListCount,
+            totalCount: originList.count,
+            inProgressCount: originList.count - stateEndListCount,
             endCount: stateEndListCount,
             deadCount: deadNum,
             injuredCount: injuredNum
         )
-        if !state.searchState.text.isEmpty {
-            list = list.filter { $0.centerName.contains(state.searchState.text) }
+    }
+    
+    private func setFilteredList() {
+        var list = state.originList
+        if !state.searchText.isEmpty {
+            list = list.filter { $0.centerName.contains(state.searchText) }
         }
-        if state.filterState.regionSelectedOption != "전체" {
-            list = list.filter { $0.centerName.prefix(2) == state.filterState.regionSelectedOption }
+        if state.regionFilterItem != "전체" {
+            list = list.filter { $0.centerName.prefix(2) == state.regionFilterItem }
         }
-        if state.filterState.stateSelectedOption != "전체" {
-            list = list.filter { $0.state.contains(state.filterState.stateSelectedOption) }
+        if state.stateFilterItem != "전체" {
+            list = list.filter { $0.state.contains(state.stateFilterItem) }
         }
-        return list
+        if state.pushOnCenter != "" {
+            list = list.filter { $0.centerName == state.pushOnCenter }
+        }
+        state.list = list
     }
 }

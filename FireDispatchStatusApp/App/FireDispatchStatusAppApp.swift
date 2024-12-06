@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 import Firebase
 import UserNotifications
 
@@ -15,49 +14,38 @@ import UserNotifications
 @main
 struct FireDispatchStatusAppApp: App {
     
+    @State private var selectedTab = 0
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                let fireDispatchStore = Store(initialState: FireDispatchFeature.State()) {
-                    FireDispatchFeature()
-                }
-                FireDispatchView(store: fireDispatchStore)
+            TabView(selection: $selectedTab) {
+                FireDispatchView()
+                    .tag(0)
                     .tabItem {
                         Label("화재 출동 현황", systemImage: "flame.fill")
                     }
                 
-                let pushSettingStore = Store(initialState: PushSettingFeature.State()) {
-                    PushSettingFeature()
-                }
-                PushSettingView(store: pushSettingStore)
+                PushSettingView()
+                    .tag(1)
                     .tabItem {
                         Label("알림 설정", systemImage: "bell.fill")
                     }
                 
                 MoreView()
-                    .background(Color.appTheme)
-                    .backgroundStyle(Color.appTheme)
+                    .tag(2)
                     .tabItem {
                         Label("더보기", systemImage: "ellipsis")
                     }
             }
-            .onAppear {
-                let appearance = UITabBarAppearance()
-                appearance.backgroundColor = .init(named: "Theme")
-                appearance.stackedLayoutAppearance.normal.iconColor = .gray
-                appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-                    .foregroundColor: UIColor.gray
-                ]
-                appearance.stackedLayoutAppearance.selected.iconColor = UIColor(
-                    named: "Text"
-                ) ?? .white
-                appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-                    .foregroundColor: UIColor(named: "Text") ?? .white
-                ]
-                UITabBar.appearance().standardAppearance = appearance
-                UITabBar.appearance().scrollEdgeAppearance = appearance
+            .tint(.appText)
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: .selectedTabView
+                )
+            ) { notification in
+                guard let tabIndex = notification.object as? Int else { return }
+                selectedTab = tabIndex
             }
         }
     }
@@ -86,11 +74,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         application.registerForRemoteNotifications()
         Messaging.messaging().delegate = self
         setNotificationObserver()
-        if let notification = launchOptions?[
-            UIApplication.LaunchOptionsKey.remoteNotification
-        ] as? [String: Any] {
-            print("debug123 \(notification)")
-        }
         return true
     }
 }
@@ -115,9 +98,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
-        let userInfo = response.notification.request.content.userInfo
         if let userInfo = response.notification.request.content.userInfo as? [String: Any] {
-            print("debug456 \(userInfo)")
+            handleFCMPushNotification(userInfo)
         }
     }
 }
@@ -146,7 +128,7 @@ extension AppDelegate {
         guard let swiftDataManager = try? SwiftDataManager<PushData>(),
               let pushData = try? swiftDataManager.get() else { return }
         guard fcmToken != pushData.fcmToken else { return }
-        guard pushData.isOn else { return }
+        guard pushData.isOn, pushData.centerName != "" else { return }
         Task {
             do {
                 guard let deviceID = DeviceIDManager().getToKeyChain() else { return }
@@ -174,7 +156,6 @@ extension AppDelegate {
     }
     
     @objc private func didBecomeActive() {
-        UIApplication.shared.applicationIconBadgeNumber = 0
         UNUserNotificationCenter.current().setBadgeCount(0)
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             guard let self else { return }
@@ -183,7 +164,7 @@ extension AppDelegate {
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
                 guard !pushData.isOn else { return }
-                self.pushOn(pushData: pushData, swiftDataManager: swiftDataManager)
+                pushOn(pushData: pushData, swiftDataManager: swiftDataManager)
             case .denied, .notDetermined:
                 guard pushData.isOn else { return }
                 self.pushOff(pushData: pushData, swiftDataManager: swiftDataManager)
@@ -194,25 +175,8 @@ extension AppDelegate {
     }
     
     private func pushOn(pushData: PushData, swiftDataManager: SwiftDataManager<PushData>) {
-        Task {
-            do {
-                guard let deviceID = DeviceIDManager().getToKeyChain() else { return }
-                guard let fcmToken = Messaging.messaging().fcmToken else { return }
-                let request = FCMRegisterRequest(
-                    token: fcmToken,
-                    centerName: pushData.centerName,
-                    deviceID: deviceID
-                )
-                let _: FCMTokenResponse = try await self.networkService.request(request)
-                try swiftDataManager.save(item: pushData.copy(
-                    fcmToken: fcmToken,
-                    isOn: true)
-                )
-                print("DEBUG: 푸시 알림을 활성화 했습니다.")
-            } catch {
-                print("DEBUG: 푸시 알림을 활성화에 실패했습니다. \(error)")
-            }
-        }
+        try? swiftDataManager.save(item: pushData.copy(isOn: true))
+        print("DEBUG: 푸시 알림을 활성화 했습니다.")
     }
     
     private func pushOff(pushData: PushData, swiftDataManager: SwiftDataManager<PushData>) {
@@ -221,12 +185,21 @@ extension AppDelegate {
                 guard let deviceID = DeviceIDManager().getToKeyChain() else { return }
                 let request = FCMTokenDeleteRequest(deviceId: deviceID)
                 let _: FCMTokenResponse = try await self.networkService.request(request)
-                try swiftDataManager.save(item: pushData.copy(isOn: false))
+                try swiftDataManager.save(item: pushData.copy(centerName: "", isOn: false))
                 print("DEBUG: 푸시 알림을 비활성화 했습니다.")
             } catch {
                 print("DEBUG: 푸시 알림을 비활성화에 실패 했습니다. \(error)")
             }
         }
-
+    }
+    
+    private func handleFCMPushNotification(_ userInfo: [String: Any]) {
+        let sidoOvrNum = userInfo["sidoOvrNum"] ?? ""
+        NotificationCenter.default.post(name: .selectedTabView, object: 0)
+        Task {
+            try? await Task.sleep(for: .milliseconds(100))
+            NotificationCenter.default.post(name: .fireDispatchPushTap, object: sidoOvrNum)
+        }
     }
 }
+ 

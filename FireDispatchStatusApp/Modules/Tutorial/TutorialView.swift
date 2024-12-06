@@ -45,8 +45,8 @@ struct TutorialView: View {
                         .font(.system(size: 18, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.appBackground)
-                        .foregroundColor(Color.appText)
+                        .foregroundColor(Color.appBackground)
+                        .background(Color.appText)
                         .cornerRadius(10)
                 })
             }

@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 
+@MainActor
 struct SearchView: View {
     
-    @Bindable var store: StoreOf<SearchFeature>
+    private let feature: SearchFeature
+    
+    init(feature: SearchFeature) {
+        self.feature = feature
+    }
 
     var body: some View {
         HStack {
@@ -18,8 +22,13 @@ struct SearchView: View {
                 .foregroundColor(Color.appText)
                 .padding(.leading, 10)
             
-            TextField("", text: $store.text.sending(\.textFeildEditing))
-            .placeholder(when: store.text.isEmpty, placeholder: {
+            TextField("", text: Binding(
+                get: { feature.state.text },
+                set: { newValue in
+                    feature.send(.textFeildEditing(newValue))
+                }
+            ))
+            .placeholder(when: feature.state.text.isEmpty, placeholder: {
                 Text("소방서를 검색 해보세요 :)")
                     .foregroundStyle(Color.appText.opacity(0.6))
             })

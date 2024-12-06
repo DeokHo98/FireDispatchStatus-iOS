@@ -4,198 +4,123 @@
 //
 //  Created by Jeong Deokho on 11/22/24.
 //
-
-import ComposableArchitecture
 import Foundation
 import UIKit
 import FirebaseMessaging
+import Combine
 
-@Reducer
-struct PushSettingFeature {
-    @ObservableState
-    struct State: Equatable {
-        @Presents var alertState: AlertState<Alert>?
+@MainActor
+final class PushSettingFeature {
+    private let netWorkService: NetworkServiceDependency
+    private var swiftDataManager: SwiftDataManager<PushData>?
+    
+    init(
+        netWorkService: NetworkServiceDependency = NetworkService(),
+        swiftDataManager: SwiftDataManager<PushData>? = nil
+    ) {
+        if let swiftDataManager {
+            self.swiftDataManager = swiftDataManager
+        } else {
+            self.swiftDataManager = try? SwiftDataManager<PushData>()
+        }
+        self.netWorkService = netWorkService
+        sinkSearchDelegate()
+        sinkFilterDelegate()
+    }
+    
+    private(set) var state = State()
+    private var cancellables = Set<AnyCancellable>()
+    private(set) var searchFeature = SearchFeature()
+    private(set) var filterFeature = FilterFeature(filters: [.region])
+    
+    @Observable
+    final class State {
+        var alertState: (type: Alert, model: AlertModel) = (.dismiss, AlertModel())
         var list: [FireStationModel] = []
         var originList: [FireStationModel] = []
-        var pushOnStation: String = ""
-        var searchState = SearchFeature.State()
-        var filterState = FilterFeature.State(viewType: .pushSettingView)
+        var pushOnCenter: String = ""
+        var searchText = ""
+        var regionFilterItem = "전체"
     }
     
     enum Action {
-        case loadFireStationList
-        case searchAction(SearchFeature.Action)
-        case alertAction(PresentationAction<Alert>)
+        case fetchList
         case didSelectedRow(String)
-        case pushOnOffSuccess(String)
-        case pushOnOffFailed(String)
-        case filterAction(FilterFeature.Action)
-        case bellButtonTap
+        case alertAction(Alert)
     }
     
-    var body: some ReducerOf<Self> {
-        Scope(state: \.searchState, action: \.searchAction) {
-            SearchFeature()
-        }
-        Scope(state: \.filterState, action: \.filterAction) {
-            FilterFeature()
-        }
-        Reduce { state, action in
-            switch action {
-            case .loadFireStationList:
-                guard let url = Bundle.main.url(
-                    forResource: "FireStationList",
-                    withExtension: "json"
-                ) else { return .none }
-                let data = try? Data(contentsOf: url)
-                let list = try? JSONDecoder().decode([String].self, from: data ?? Data())
-                let fireStationList = list ?? []
-                let originList = fireStationList.map { FireStationModel(name: $0) }
-                state.originList = originList
-                state.pushOnStation = pushOnStation()
-                state.list = self.filteredList(state: state)
-                return .none
-            case .searchAction(.delegate(.textFeildEditing)):
-                state.pushOnStation = pushOnStation()
-                state.list = self.filteredList(state: state)
-                return .none
-            case .didSelectedRow(let centerName):
-                guard let swiftDataManager = try? SwiftDataManager<PushData>(),
-                      let pushData = try? swiftDataManager.get() else { return .none }
-                guard pushData.isOn else {
-                    state.alertState = self.getPushSettingAlert()
-                    return .none
-                }
-                if state.pushOnStation == centerName {
-                    state.alertState = self.getPushOffAlert(centerName: centerName)
-                } else {
-                    state.alertState = self.getPushOnAlert(centerName: centerName)
-                }
-                return .none
-            case .alertAction(.presented(.pushSettingAlert)):
-                guard let url = URL(string: UIApplication.openSettingsURLString) else {
-                    return .none
-                }
+    func send(_ action: Action) {
+        switch action {
+        case .fetchList:
+            fetchList()
+        case .didSelectedRow(let centerName):
+            didSelectedRow(centerName: centerName)
+        case .alertAction(let type):
+            switch type {
+            case .pushSetting:
+                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                 UIApplication.shared.open(url)
-                return .none
-            case .alertAction(.presented(.pushOffAlert)):
-                guard let swiftDataManager = try? SwiftDataManager<PushData>(),
-                      let pushData = try? swiftDataManager.get() else { return .none }
-                guard let deviceID = DeviceIDManager().getToKeyChain() else { return .none }
-                let service = NetworkService()
-                let request = FCMTokenDeleteRequest(deviceId: deviceID)
-                return .run { send in
+            case .pushOn, .pushOff:
+                Task {
                     do {
-                        let result: FCMTokenResponse = try await service.request(request)
-                        guard result.success else {
-                            await send(.pushOnOffFailed(result.error ?? "실패했습니다."))
-                            return
+                        if case .pushOn(let centerName) = type {
+                            try await pushOn(centerName: centerName)
+                        } else {
+                            try await pushOff()
                         }
-                        let newPushData = pushData.copy(centerName: "")
-                        try swiftDataManager.save(item: newPushData)
-                        await send(.pushOnOffSuccess(""))
-                    } catch {
-                        await send(.pushOnOffFailed(error.localizedDescription))
+                        setPushOnCenter()
+                    } catch let error as CustomError {
+                        state.alertState = (
+                            .default,
+                            AlertModel(isShow: true, title: error.localizedDescription)
+                        )
                     }
-        
                 }
-            case .alertAction(.presented(.pushOnAlert(let centerName))):
-                guard let swiftDataManager = try? SwiftDataManager<PushData>(),
-                      let pushData = try? swiftDataManager.get() else { return .none }
-                guard let deviceID = DeviceIDManager().getToKeyChain() else { return .none }
-                guard let fcmToken = Messaging.messaging().fcmToken else { return .none }
-                let service = NetworkService()
-                let request = FCMRegisterRequest(
-                    token: fcmToken,
-                    centerName: centerName,
-                    deviceID: deviceID
-                )
-                return .run { send in
-                    do {
-                        let result: FCMTokenResponse = try await service.request(request)
-                        guard result.success else {
-                            await send(.pushOnOffFailed(result.error ?? "실패했습니다."))
-                            return
-                        }
-                        let newPushData = pushData.copy(centerName: centerName)
-                        try swiftDataManager.save(item: newPushData)
-                        await send(.pushOnOffSuccess(centerName))
-                    } catch {
-                        await send(.pushOnOffFailed(error.localizedDescription))
-                    }
-        
-                }
-            case .pushOnOffSuccess(let pushOnStation):
-                state.pushOnStation = pushOnStation
-                return .none
-            case .pushOnOffFailed(let errorMessage):
-                state.alertState = .onlyOkButtonAlert(title: errorMessage)
-                state.list = state.originList
-                return .none
-            case .bellButtonTap:
-                state.alertState = getPushOffAlert(centerName: state.pushOnStation)
-                return .none
-            case .alertAction:
-                state.alertState = nil
-                return .none
-            case .filterAction(.delegate(.selectedOption)):
-                state.pushOnStation = pushOnStation()
-                state.list = self.filteredList(state: state)
-                return .none
-            case .searchAction:
-                return .none
-            case .filterAction:
-                return .none
+            case .dismiss:
+                state.alertState = (.dismiss, AlertModel())
+            default:
+                break
             }
         }
     }
 }
 
-// MARK: - Alert
+// MARK: - Delegate
 
 extension PushSettingFeature {
-    enum Alert: Equatable {
-        case pushSettingAlert
-        case pushOffAlert
-        case pushOnAlert(String)
+    private func sinkSearchDelegate() {
+        self.searchFeature.delegatePublisher
+            .sink { [weak self] action in
+                self?.searchDelegateSend(action)
+            }
+            .store(in: &cancellables)
     }
     
-    func getPushSettingAlert() -> AlertState<Alert> {
-        return AlertState {
-            TextState("알림설정이 비활성화 되어있습니다.\n설정 > 알림을 확인해주세요.")
-        } actions: {
-            ButtonState(role: .cancel) {
-                TextState("확인")
-            }
-            ButtonState(role: .none, action: .pushSettingAlert) {
-                TextState("설정으로 가기")
-            }
+    private func searchDelegateSend(_ action: SearchFeature.Delegate) {
+        switch action {
+        case .textFiledEditing(let text):
+            state.searchText = text
+            setFilteredList()
         }
     }
     
-    func getPushOffAlert(centerName: String) -> AlertState<Alert> {
-        return AlertState {
-            TextState("현재 등록된 \"\(centerName)\" 알림을 끄시겠습니까?")
-        } actions: {
-            ButtonState(role: .cancel) {
-                TextState("취소")
+    private func sinkFilterDelegate() {
+        self.filterFeature.delegatePublisher
+            .sink { [weak self] action in
+                self?.filterDelegateSend(action)
             }
-            ButtonState(role: .none, action: .pushOffAlert) {
-                TextState("확인")
-            }
-        }
+            .store(in: &cancellables)
     }
     
-    func getPushOnAlert(centerName: String) -> AlertState<Alert> {
-        return AlertState {
-            TextState("\"\(centerName)\" 알림을 켜시겠습니까?")
-        } actions: {
-            ButtonState(role: .cancel) {
-                TextState("취소")
+    private func filterDelegateSend(_ action: FilterFeature.Delegate) {
+        switch action {
+        case .selectedOption(let filterType, let selectedItem):
+            if filterType == .region {
+                state.regionFilterItem = selectedItem
             }
-            ButtonState(role: .none, action: .pushOnAlert(centerName)) {
-                TextState("확인")
-            }
+            setFilteredList()
+        case .selectedPushFilterButton:
+            break
         }
     }
 }
@@ -203,21 +128,124 @@ extension PushSettingFeature {
 // MARK: - Helper Function
 
 extension PushSettingFeature {
-    func filteredList(state: State) -> [FireStationModel] {
-        var list = state.originList
-        if !state.searchState.text.isEmpty {
-            list = list.filter { $0.name.contains(state.searchState.text) }
-        }
-        if state.filterState.regionSelectedOption != "전체" {
-            list = list.filter { $0.name.prefix(2) == state.filterState.regionSelectedOption }
-        }
-        return list
+    private func fetchList() {
+        guard let url = Bundle.main.url(
+            forResource: "FireStationList",
+            withExtension: "json"
+        ) else { return }
+        let data = try? Data(contentsOf: url)
+        let list = try? JSONDecoder().decode([String].self, from: data ?? Data())
+        let fireStationList = list ?? []
+        let originList = fireStationList.map { FireStationModel(name: $0) }
+        state.originList = originList
+        setPushOnCenter()
+        setFilteredList()
     }
     
-    func pushOnStation() -> String {
-        guard let swiftDataManager = try? SwiftDataManager<PushData>(),
-              let pushData = try? swiftDataManager.get() else { return "" }
-        guard pushData.isOn else { return "" }
-        return pushData.centerName
+    private func didSelectedRow(centerName: String) {
+        guard let pushData = try? swiftDataManager?.get() else { return }
+        guard pushData.isOn else {
+            state.alertState = (
+                .pushSetting,
+                AlertModel(
+                    isShow: true,
+                    title: "알림설정이 비활성화 되어있습니다.\n설정 > 알림을 확인해주세요.",
+                    confirmText: "설정으로 가기"
+                )
+            )
+            return
+        }
+        if state.pushOnCenter == centerName {
+            state.alertState = (
+                .pushOff,
+                AlertModel(isShow: true, title: "현재 등록된 \"\(centerName)\" 알림을 끄시겠습니까?")
+            )
+        } else {
+            state.alertState = (
+                .pushOn(centerName),
+                AlertModel(isShow: true, title: "\"\(centerName)\" 알림을 켜시겠습니까?")
+            )
+        }
+    }
+    
+    private func pushOn(centerName: String) async throws {
+        guard let pushData = getPushData() else { throw CustomError.notData }
+        guard let deviceID = DeviceIDManager().getToKeyChain() else { throw CustomError.notData }
+        guard let fcmToken = Messaging.messaging().fcmToken else { throw CustomError.notData }
+        let service = NetworkService()
+        let request = FCMRegisterRequest(
+            token: fcmToken,
+            centerName: centerName,
+            deviceID: deviceID
+        )
+        let result: FCMTokenResponse = try await service.request(request)
+        guard result.success else {
+            throw CustomError.rquestFailed
+        }
+        let newPushData = pushData.copy(centerName: centerName)
+        try swiftDataManager?.save(item: newPushData)
+    }
+    
+    private func pushOff() async throws {
+        guard let pushData = getPushData() else { throw CustomError.notData }
+        guard let deviceID = DeviceIDManager().getToKeyChain() else { throw CustomError.notData }
+        let request = FCMTokenDeleteRequest(deviceId: deviceID)
+        let result: FCMTokenResponse = try await netWorkService.request(request)
+        guard result.success else {
+            throw CustomError.rquestFailed
+        }
+        let newPushData = pushData.copy(centerName: "")
+        try swiftDataManager?.save(item: newPushData)
+    }
+    
+    private func setFilteredList() {
+        var list = state.originList
+        if !state.searchText.isEmpty {
+            list = list.filter { $0.name.contains(state.searchText) }
+        }
+        if state.regionFilterItem != "전체" {
+            list = list.filter { $0.name.prefix(2) == state.regionFilterItem }
+        }
+        state.list = list
+    }
+    
+    private func setPushOnCenter() {
+        guard let pushData = getPushData() else { return }
+        guard pushData.isOn else { return }
+        state.pushOnCenter = pushData.centerName
+    }
+    
+    private func getPushData() -> PushData? {
+        return try? swiftDataManager?.get()
+    }
+}
+
+// MARK: - Alert
+
+extension PushSettingFeature {
+    enum Alert {
+        case pushSetting
+        case pushOn(String)
+        case pushOff
+        case `default`
+        case dismiss
+    }
+}
+
+// MARK: - CustomError
+
+extension PushSettingFeature {
+    enum CustomError: Error {
+        case notData
+        case rquestFailed
+        
+        var errorDescription: String? {
+            switch self {
+            case .notData:
+                return "정보가 존재하지 않습니다"
+            case .rquestFailed:
+                return "실패했습니다"
+            }
+        }
     }
 }

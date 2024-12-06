@@ -15,12 +15,20 @@
 		F22C19412CF0348300BCFCB7 /* FireStationList.json in Resources */ = {isa = PBXBuildFile; fileRef = F22C19402CF0348300BCFCB7 /* FireStationList.json */; };
 		F22C19432CF03BB800BCFCB7 /* Color+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22C19422CF03BB800BCFCB7 /* Color+Ex.swift */; };
 		F22C19472CF03C9700BCFCB7 /* PushSettingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22C19462CF03C9700BCFCB7 /* PushSettingFeature.swift */; };
+		F2469F862CFDA143004C27FC /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F852CFDA143004C27FC /* AlertModel.swift */; };
+		F2469F882CFE830C004C27FC /* FilterType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F872CFE830C004C27FC /* FilterType.swift */; };
+		F2469F8A2CFEA4AF004C27FC /* PushSettingRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F892CFEA4AF004C27FC /* PushSettingRowView.swift */; };
+		F2469F8C2CFEE2B8004C27FC /* PushSettingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F8B2CFEE2B8004C27FC /* PushSettingHeaderView.swift */; };
+		F2469F8F2CFFE783004C27FC /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F8E2CFFE783004C27FC /* MapView.swift */; };
+		F2469F912D001875004C27FC /* MapFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F902D001875004C27FC /* MapFeature.swift */; };
+		F2469F942D0018AB004C27FC /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F932D0018AB004C27FC /* LocationManager.swift */; };
+		F2469F962D012810004C27FC /* Array+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F952D012810004C27FC /* Array+Ex.swift */; };
+		F2469F992D013B70004C27FC /* NotificationCenter+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2469F982D013B70004C27FC /* NotificationCenter+Ex.swift */; };
 		F27887952CEEB55700E66ED8 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887942CEEB55700E66ED8 /* SearchView.swift */; };
 		F27887972CEEB5A100E66ED8 /* FireDispatchListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887962CEEB5A100E66ED8 /* FireDispatchListRow.swift */; };
 		F27887992CEEB5D300E66ED8 /* TextFeild+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887982CEEB5D300E66ED8 /* TextFeild+Ex.swift */; };
 		F278879B2CEEB62300E66ED8 /* UIApplication+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F278879A2CEEB62300E66ED8 /* UIApplication+Ex.swift */; };
 		F27887A12CEEB88F00E66ED8 /* FireDispatchFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887A02CEEB88F00E66ED8 /* FireDispatchFeature.swift */; };
-		F27887A42CEEBA9D00E66ED8 /* AlertState+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887A32CEEBA9D00E66ED8 /* AlertState+Ex.swift */; };
 		F27887A62CEEC8A900E66ED8 /* SearchFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887A52CEEC8A900E66ED8 /* SearchFeature.swift */; };
 		F27887A82CEEEA0300E66ED8 /* Date+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27887A72CEEEA0300E66ED8 /* Date+Ex.swift */; };
 		F27887AF2CEF1B9400E66ED8 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = F27887AE2CEF1B9400E66ED8 /* FirebaseAnalytics */; };
@@ -56,12 +64,11 @@
 		F2A4E4272CF6AD3800C6364E /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4E4262CF6AD3800C6364E /* FilterView.swift */; };
 		F2A4E42E2CF6CE9400C6364E /* FilterFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4E42D2CF6CE9400C6364E /* FilterFeature.swift */; };
 		F2A4E4302CF6E53100C6364E /* FireDispatchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4E42F2CF6E53100C6364E /* FireDispatchHeaderView.swift */; };
-		F2A4E4322CF6F13300C6364E /* FireDispatchHeaderFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4E4312CF6F13300C6364E /* FireDispatchHeaderFeature.swift */; };
+		F2A4E4322CF6F13300C6364E /* FireDispatchHeaderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4E4312CF6F13300C6364E /* FireDispatchHeaderState.swift */; };
 		F2B626FC2CF065B100E00B24 /* FCMModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B626FB2CF065B100E00B24 /* FCMModel.swift */; };
 		F2EAE4A32CF7061800FF690E /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EAE4A22CF7061800FF690E /* TutorialView.swift */; };
 		F2EAE4A62CF7DF3500FF690E /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EAE4A52CF7DF3500FF690E /* MoreView.swift */; };
 		F2EAE4A82CF7EB6700FF690E /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EAE4A72CF7EB6700FF690E /* MailView.swift */; };
-		F2EE40192CEDAD5F00C87804 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = F2EE40182CEDAD5F00C87804 /* ComposableArchitecture */; };
 		F2EE40272CEDB2CB00C87804 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = F2EE40262CEDB2CB00C87804 /* .swiftlint.yml */; };
 		F2EE402C2CEDBEB500C87804 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE402B2CEDBEB500C87804 /* NetworkError.swift */; };
 		F2EE402E2CEDBEDB00C87804 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EE402D2CEDBEDB00C87804 /* HTTPMethod.swift */; };
@@ -81,12 +88,20 @@
 		F22C19402CF0348300BCFCB7 /* FireStationList.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = FireStationList.json; sourceTree = "<group>"; };
 		F22C19422CF03BB800BCFCB7 /* Color+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Ex.swift"; sourceTree = "<group>"; };
 		F22C19462CF03C9700BCFCB7 /* PushSettingFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushSettingFeature.swift; sourceTree = "<group>"; };
+		F2469F852CFDA143004C27FC /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
+		F2469F872CFE830C004C27FC /* FilterType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterType.swift; sourceTree = "<group>"; };
+		F2469F892CFEA4AF004C27FC /* PushSettingRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushSettingRowView.swift; sourceTree = "<group>"; };
+		F2469F8B2CFEE2B8004C27FC /* PushSettingHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushSettingHeaderView.swift; sourceTree = "<group>"; };
+		F2469F8E2CFFE783004C27FC /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		F2469F902D001875004C27FC /* MapFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapFeature.swift; sourceTree = "<group>"; };
+		F2469F932D0018AB004C27FC /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		F2469F952D012810004C27FC /* Array+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Ex.swift"; sourceTree = "<group>"; };
+		F2469F982D013B70004C27FC /* NotificationCenter+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationCenter+Ex.swift"; sourceTree = "<group>"; };
 		F27887942CEEB55700E66ED8 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		F27887962CEEB5A100E66ED8 /* FireDispatchListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchListRow.swift; sourceTree = "<group>"; };
 		F27887982CEEB5D300E66ED8 /* TextFeild+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextFeild+Ex.swift"; sourceTree = "<group>"; };
 		F278879A2CEEB62300E66ED8 /* UIApplication+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Ex.swift"; sourceTree = "<group>"; };
 		F27887A02CEEB88F00E66ED8 /* FireDispatchFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchFeature.swift; sourceTree = "<group>"; };
-		F27887A32CEEBA9D00E66ED8 /* AlertState+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertState+Ex.swift"; sourceTree = "<group>"; };
 		F27887A52CEEC8A900E66ED8 /* SearchFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFeature.swift; sourceTree = "<group>"; };
 		F27887A72CEEEA0300E66ED8 /* Date+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Ex.swift"; sourceTree = "<group>"; };
 		F27887AB2CEF0A0500E66ED8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -100,7 +115,7 @@
 		F2A4E4262CF6AD3800C6364E /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 		F2A4E42D2CF6CE9400C6364E /* FilterFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterFeature.swift; sourceTree = "<group>"; };
 		F2A4E42F2CF6E53100C6364E /* FireDispatchHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchHeaderView.swift; sourceTree = "<group>"; };
-		F2A4E4312CF6F13300C6364E /* FireDispatchHeaderFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchHeaderFeature.swift; sourceTree = "<group>"; };
+		F2A4E4312CF6F13300C6364E /* FireDispatchHeaderState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireDispatchHeaderState.swift; sourceTree = "<group>"; };
 		F2B626FB2CF065B100E00B24 /* FCMModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMModel.swift; sourceTree = "<group>"; };
 		F2EAE4A22CF7061800FF690E /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		F2EAE4A52CF7DF3500FF690E /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
@@ -125,7 +140,6 @@
 				F27887C52CEF1B9400E66ED8 /* FirebaseFirestore in Frameworks */,
 				F27887B12CEF1B9400E66ED8 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 				F27887CF2CEF1B9400E66ED8 /* FirebaseInstallations in Frameworks */,
-				F2EE40192CEDAD5F00C87804 /* ComposableArchitecture in Frameworks */,
 				F27887B52CEF1B9400E66ED8 /* FirebaseAppCheck in Frameworks */,
 				F27887CD2CEF1B9400E66ED8 /* FirebaseInAppMessaging-Beta in Frameworks */,
 				F27887B32CEF1B9400E66ED8 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
@@ -155,6 +169,7 @@
 		F21F0BAC2CF012DB00274324 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				F2469F922D0018A4004C27FC /* Location */,
 				F22C19392CF022D800BCFCB7 /* SwiftData */,
 				F21F0BAF2CF015C400274324 /* DeviceID */,
 			);
@@ -200,6 +215,8 @@
 			isa = PBXGroup;
 			children = (
 				F22C193E2CF0326800BCFCB7 /* PushSettingView.swift */,
+				F2469F8B2CFEE2B8004C27FC /* PushSettingHeaderView.swift */,
+				F2469F892CFEA4AF004C27FC /* PushSettingRowView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -212,12 +229,62 @@
 			path = Feature;
 			sourceTree = "<group>";
 		};
+		F2469F842CFDA13C004C27FC /* Alert */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F852CFDA143004C27FC /* AlertModel.swift */,
+			);
+			path = Alert;
+			sourceTree = "<group>";
+		};
+		F2469F8D2CFFE76A004C27FC /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F9B2D0276CC004C27FC /* Feature */,
+				F2469F9C2D0276D0004C27FC /* View */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		F2469F922D0018A4004C27FC /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F932D0018AB004C27FC /* LocationManager.swift */,
+			);
+			path = Location;
+			sourceTree = "<group>";
+		};
+		F2469F972D013B61004C27FC /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F982D013B70004C27FC /* NotificationCenter+Ex.swift */,
+			);
+			name = Other;
+			sourceTree = "<group>";
+		};
+		F2469F9B2D0276CC004C27FC /* Feature */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F902D001875004C27FC /* MapFeature.swift */,
+			);
+			path = Feature;
+			sourceTree = "<group>";
+		};
+		F2469F9C2D0276D0004C27FC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F2469F8E2CFFE783004C27FC /* MapView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		F278878E2CEEB44E00E66ED8 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
 				F2A4E4282CF6B60E00C6364E /* Common */,
 				F2EAE4A12CF7060A00FF690E /* Tutorial */,
 				F27887902CEEB46700E66ED8 /* FireDispatch */,
+				F2469F8D2CFFE76A004C27FC /* Map */,
 				F22C193D2CF0325600BCFCB7 /* PushSetting */,
 				F2EAE4A42CF7DF1F00FF690E /* MoreView */,
 			);
@@ -266,6 +333,7 @@
 			children = (
 				F2EE40372CEDC21A00C87804 /* String+Ex.swift */,
 				F27887A72CEEEA0300E66ED8 /* Date+Ex.swift */,
+				F2469F952D012810004C27FC /* Array+Ex.swift */,
 			);
 			path = Type;
 			sourceTree = "<group>";
@@ -291,17 +359,9 @@
 			isa = PBXGroup;
 			children = (
 				F27887A02CEEB88F00E66ED8 /* FireDispatchFeature.swift */,
-				F2A4E4312CF6F13300C6364E /* FireDispatchHeaderFeature.swift */,
+				F2A4E4312CF6F13300C6364E /* FireDispatchHeaderState.swift */,
 			);
 			path = Feature;
-			sourceTree = "<group>";
-		};
-		F27887A22CEEBA9100E66ED8 /* TCA */ = {
-			isa = PBXGroup;
-			children = (
-				F27887A32CEEBA9D00E66ED8 /* AlertState+Ex.swift */,
-			);
-			path = TCA;
 			sourceTree = "<group>";
 		};
 		F28B0EEF2CEDA7D000F8CEA5 = {
@@ -356,6 +416,7 @@
 		F2A4E4282CF6B60E00C6364E /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				F2469F842CFDA13C004C27FC /* Alert */,
 				F2A4E42B2CF6B62200C6364E /* Filter */,
 				F2A4E42C2CF6B63400C6364E /* Search */,
 			);
@@ -367,6 +428,7 @@
 			children = (
 				F2A4E4262CF6AD3800C6364E /* FilterView.swift */,
 				F2A4E42D2CF6CE9400C6364E /* FilterFeature.swift */,
+				F2469F872CFE830C004C27FC /* FilterType.swift */,
 			);
 			path = Filter;
 			sourceTree = "<group>";
@@ -420,10 +482,10 @@
 		F2EE40362CEDC20E00C87804 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F27887A22CEEBA9100E66ED8 /* TCA */,
 				F278879E2CEEB65F00E66ED8 /* UIKit */,
 				F278879D2CEEB65A00E66ED8 /* SwiftUI */,
 				F278879C2CEEB63B00E66ED8 /* Type */,
+				F2469F972D013B61004C27FC /* Other */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -465,7 +527,6 @@
 			);
 			name = FireDispatchStatusApp;
 			packageProductDependencies = (
-				F2EE40182CEDAD5F00C87804 /* ComposableArchitecture */,
 				F27887AE2CEF1B9400E66ED8 /* FirebaseAnalytics */,
 				F27887B02CEF1B9400E66ED8 /* FirebaseAnalyticsOnDeviceConversion */,
 				F27887B22CEF1B9400E66ED8 /* FirebaseAnalyticsWithoutAdIdSupport */,
@@ -520,7 +581,6 @@
 			);
 			mainGroup = F28B0EEF2CEDA7D000F8CEA5;
 			packageReferences = (
-				F2EE40172CEDAD5F00C87804 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				F2EE40232CEDB23300C87804 /* XCRemoteSwiftPackageReference "SwiftLint" */,
 				F27887AD2CEF1B9400E66ED8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
@@ -553,23 +613,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2469F882CFE830C004C27FC /* FilterType.swift in Sources */,
 				F2A4E4212CF3EC6100C6364E /* FireStationModel.swift in Sources */,
 				F2EE402E2CEDBEDB00C87804 /* HTTPMethod.swift in Sources */,
 				F2EE40382CEDC21A00C87804 /* String+Ex.swift in Sources */,
 				F2EE403E2CEDC31A00C87804 /* FireDispatchModel.swift in Sources */,
 				F2EAE4A82CF7EB6700FF690E /* MailView.swift in Sources */,
 				F21F0BAE2CF012EA00274324 /* DeviceIDManager.swift in Sources */,
+				F2469F8A2CFEA4AF004C27FC /* PushSettingRowView.swift in Sources */,
+				F2469F8F2CFFE783004C27FC /* MapView.swift in Sources */,
 				F2EE402C2CEDBEB500C87804 /* NetworkError.swift in Sources */,
+				F2469F942D0018AB004C27FC /* LocationManager.swift in Sources */,
 				F27887952CEEB55700E66ED8 /* SearchView.swift in Sources */,
-				F2A4E4322CF6F13300C6364E /* FireDispatchHeaderFeature.swift in Sources */,
+				F2A4E4322CF6F13300C6364E /* FireDispatchHeaderState.swift in Sources */,
 				F2A4E4302CF6E53100C6364E /* FireDispatchHeaderView.swift in Sources */,
 				F28B0EFE2CEDA7D000F8CEA5 /* FireDispatchView.swift in Sources */,
 				F2A4E4272CF6AD3800C6364E /* FilterView.swift in Sources */,
+				F2469F862CFDA143004C27FC /* AlertModel.swift in Sources */,
 				F28B0EFC2CEDA7D000F8CEA5 /* FireDispatchStatusAppApp.swift in Sources */,
+				F2469F8C2CFEE2B8004C27FC /* PushSettingHeaderView.swift in Sources */,
+				F2469F912D001875004C27FC /* MapFeature.swift in Sources */,
 				F27887A62CEEC8A900E66ED8 /* SearchFeature.swift in Sources */,
+				F2469F962D012810004C27FC /* Array+Ex.swift in Sources */,
 				F22C19382CF021B700BCFCB7 /* PushData.swift in Sources */,
 				F2EE40322CEDBF5C00C87804 /* NetworkService.swift in Sources */,
 				F2EAE4A32CF7061800FF690E /* TutorialView.swift in Sources */,
+				F2469F992D013B70004C27FC /* NotificationCenter+Ex.swift in Sources */,
 				F2EE40302CEDBF0500C87804 /* NetworkRequest.swift in Sources */,
 				F21F0BAA2CF00D6700274324 /* FCMRequest.swift in Sources */,
 				F22C19472CF03C9700BCFCB7 /* PushSettingFeature.swift in Sources */,
@@ -585,7 +654,6 @@
 				F27887A12CEEB88F00E66ED8 /* FireDispatchFeature.swift in Sources */,
 				F2B626FC2CF065B100E00B24 /* FCMModel.swift in Sources */,
 				F278879B2CEEB62300E66ED8 /* UIApplication+Ex.swift in Sources */,
-				F27887A42CEEBA9D00E66ED8 /* AlertState+Ex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,14 +894,6 @@
 				minimumVersion = 11.5.0;
 			};
 		};
-		F2EE40172CEDAD5F00C87804 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.16.1;
-			};
-		};
 		F2EE40232CEDB23300C87804 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/SwiftLint.git";
@@ -964,11 +1024,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F27887AD2CEF1B9400E66ED8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseVertexAI;
-		};
-		F2EE40182CEDAD5F00C87804 /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F2EE40172CEDAD5F00C87804 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
 		};
 		F2EE40242CEDB29A00C87804 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;

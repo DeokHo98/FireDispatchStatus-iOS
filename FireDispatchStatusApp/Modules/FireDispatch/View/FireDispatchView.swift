@@ -6,16 +6,16 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 
+@MainActor
 struct FireDispatchView: View {
+    
+    private let feature = FireDispatchFeature()
     
     @AppStorage("isTutorialShown") private var isTutorialShown: Bool = false
     @Environment(\.scenePhase) private var scenePhase
-    @Bindable var store: StoreOf<FireDispatchFeature>
     
-    init(store: StoreOf<FireDispatchFeature>) {
-        self.store = store
+    init() {
         UINavigationBar.appearance().largeTitleTextAttributes = [
             .foregroundColor: UIColor(named: "Text") ?? .white
         ]
@@ -23,44 +23,53 @@ struct FireDispatchView: View {
             .foregroundColor: UIColor(named: "Text") ?? .white
         ]
     }
-    
+
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 VStack(alignment: .leading, spacing: 0) {
-                    SearchView(
-                        store: store.scope(state: \.searchState, action: \.searchAction)
-                    )
+                    SearchView(feature: feature.searchFeature)
                     
-                    FilterView(
-                        store: store.scope(state: \.filterState, action: \.filterAction)
-                    )
+                    FilterView(feature: feature.filterFeature)
                     .padding(.horizontal)
                     .padding(.vertical, 10)
                     
                     ScrollView {
-                        Section {
-                            if let headerState = store.headerState {
-                                FireDispatchHeaderView(state: headerState)
+                        ScrollViewReader { proxy in
+                            Section {
+                                if let headerState = feature.state.headerState {
+                                    FireDispatchHeaderView(state: headerState)
+                                }
                             }
-                        }
-                        if store.list.isEmpty {
-                            ContentUnavailableView(
-                                "해당 화재 출동 건이 없습니다.",
-                                systemImage: "magnifyingglass"
-                            )
-                            .foregroundStyle(Color.appText)
-                        } else {
-                            LazyVStack {
-                                Section {
-                                    ForEach(store.list, id: \.sidoOvrNum) { model in
-                                        FireDispatchListRow(model: model)
+                            if feature.state.list.isEmpty {
+                                ContentUnavailableView(
+                                    "해당 화재 출동 건이 없습니다.",
+                                    systemImage: "magnifyingglass"
+                                )
+                                .foregroundStyle(Color.appText)
+                            } else {
+                                LazyVStack {
+                                    Section {
+                                        ForEach(feature.state.list, id: \.sidoOvrNum) { model in
+                                            FireDispatchListRow(model: model)
+                                                .id(model.sidoOvrNum)
+                                                .contentShape(Rectangle())
+                                                .onTapGesture {
+                                                    feature.send(.didSelectedRow(model))
+                                                }
+                                                
+                                        }
+                                    }
+                                    .background(Color.appBackground)
+                                    .cornerRadius(15)
+                                    .padding(.horizontal)
+                                    .padding(.bottom, 10)
+                                }
+                                .onChange(of: feature.state.scrollToRow) { _, newValue in
+                                    withAnimation(.smooth) {
+                                        proxy.scrollTo(newValue, anchor: .top)
                                     }
                                 }
-                                .background(Color.appBackground)
-                                .cornerRadius(15)
-                                .padding(.horizontal)
-                                .padding(.bottom, 10)
                             }
                         }
                     }
@@ -69,7 +78,7 @@ struct FireDispatchView: View {
                         UIApplication.hideKeyBoard()
                     }
                     .refreshable {
-                        store.send(.refreshButtonTap)
+                        feature.send(.fetchList)
                     }
                 }
                 .background(Color.appTheme)
@@ -77,14 +86,22 @@ struct FireDispatchView: View {
                     TutorialView()
                 }
             }
-            .alert($store.scope(state: \.alertState, action: \.alertAction))
+            .defaultAlert(feature.state.alertState, onDismiss: {
+                feature.send(.dismissAlert)
+            })
             .navigationTitle(Date().getMonthDayString() + " 화재출동 현황")
             .navigationBarTitleDisplayMode(.large)
-            .onChange(of: scenePhase) { (_, phase) in
-                if phase == .active {
-                    store.send(.fetchFireDispatchList)
-                }
+            .onAppear {
+                feature.send(.fetchList)
             }
+            .fullScreenCover(
+                item: Binding(
+                    get: { feature.state.mapState },
+                    set: { _ in feature.send(.dismissMapFeature) }
+                ),
+                content: { state in
+                    MapView(state: state)
+                })
         }
     }
 }

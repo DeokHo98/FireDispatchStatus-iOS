@@ -5,37 +5,37 @@
 //  Created by Jeong Deokho on 11/21/24.
 //
 
-import ComposableArchitecture
+import SwiftUI
+import Combine
 
-@Reducer
+@MainActor
 struct SearchFeature {
-    @ObservableState
-    struct State: Equatable {
-        var text: String = ""
+    
+    @Observable
+    final class State {
+        var text = ""
     }
     
     enum Action {
         case textFeildEditing(String)
-        case delegate(Delegate)
     }
     
-    var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            switch action {
-            case .textFeildEditing(let text):
-                state.text = text
-                return .run { send in
-                    await send(.delegate(.textFeildEditing))
-                }
-            case .delegate:
-                return .none
-            }
+    private(set) var state = State()
+    private(set) var delegatePublisher = PassthroughSubject<Delegate, Never>()
+    
+    func send(_ action: Action) {
+        switch action {
+        case .textFeildEditing(let text):
+            state.text = text
+            delegatePublisher.send(.textFiledEditing(text))
         }
     }
 }
 
+// MARK: - Delegate
+
 extension SearchFeature {
     enum Delegate {
-        case textFeildEditing
+        case textFiledEditing(String)
     }
 }

@@ -6,51 +6,44 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 
+@MainActor
 struct PushSettingView: View {
     
-    @Bindable var store: StoreOf<PushSettingFeature>
-    @State var isViewDidLoad = false
+    private let feature = PushSettingFeature()
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                SearchView(
-                    store: store.scope(state: \.searchState, action: \.searchAction)
-                )
-                FilterView(
-                    store: store.scope(state: \.filterState, action: \.filterAction)
-                )
+                SearchView(feature: feature.searchFeature)
+                
+                FilterView(feature: feature.filterFeature)
                 .padding(.horizontal)
                 .padding(.vertical, 10)
+          
+                if !feature.state.pushOnCenter.isEmpty {
+                    HStack {
+                        Spacer()
+                        PushSettingHeaderView(pushOnCenter: feature.state.pushOnCenter)
+                            .onTapGesture {
+                                feature.send(.didSelectedRow(feature.state.pushOnCenter))
+                            }
+                        Spacer()
+                    }
+                }
+                
                 ScrollView {
-                    if store.list.isEmpty {
+                    if feature.state.list.isEmpty {
                         ContentUnavailableView("해당 소방서가 없습니다.", systemImage: "magnifyingglass")
                     } else {
                         LazyVStack {
                             Section {
-                                ForEach(store.list, id: \.id) { model in
-                                    HStack {
-                                        Text(model.name)
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundStyle(Color.appText)
-                                            .padding(.trailing, 5)
-                                        if store.pushOnStation == model.name {
-                                            Image(systemName: "bell.fill")
-                                                .resizable()
-                                                .frame(width: 18, height: 18)
-                                                .foregroundStyle(Color.appText)
+                                ForEach(feature.state.list, id: \.id) { model in
+                                    PushSettingRowView(model: model)
+                                        .onTapGesture {
+                                            UIApplication.hideKeyBoard()
+                                            feature.send(.didSelectedRow(model.name))
                                         }
-                                        Spacer()
-                                    }
-                                    .frame(minHeight: 20)
-                                    .padding()
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        UIApplication.hideKeyBoard()
-                                        store.send(.didSelectedRow(model.name))
-                                    }
                                 }
                             }
                             .background(Color.appBackground)
@@ -61,27 +54,45 @@ struct PushSettingView: View {
                     }
                 }
                 .frame(minWidth: UIScreen.main.bounds.width)
-                .onAppear {
-                    guard !isViewDidLoad else { return }
-                    store.send(.loadFireStationList)
-                    isViewDidLoad = true
-                }
             }
             .background(Color.appTheme)
-            .alert($store.scope(state: \.alertState, action: \.alertAction))
             .navigationTitle("알림 설정")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if !store.pushOnStation.isEmpty {
-                        Button {
-                            store.send(.bellButtonTap)
-                        } label: {
-                            Image(systemName: "bell.fill")
-                                .foregroundStyle(Color.appText)
-                        }
-                    }
+            .onAppear {
+                guard feature.state.list.isEmpty else { return }
+                feature.send(.fetchList)
+            }
+            .modifier(
+                PushSettingAlert(
+                type: feature.state.alertState.type,
+                model: feature.state.alertState.model,
+                feature: feature
+            )
+            )
+        }
+    }
+}
+
+extension PushSettingView {
+    struct PushSettingAlert: ViewModifier {
+        let type: PushSettingFeature.Alert
+        let model: AlertModel
+        let feature: PushSettingFeature
+        
+        func body(content: Content) -> some View {
+            switch type {
+            case .default:
+                content.defaultAlert(model) {
+                    feature.send(.alertAction(.dismiss))
                 }
+            case .pushOn, .pushOff, .pushSetting:
+                content.confirmAlert(model) {
+                    feature.send(.alertAction(.dismiss))
+                } onConfirm: {
+                    feature.send(.alertAction(type))
+                }
+            default:
+                content
             }
         }
     }
