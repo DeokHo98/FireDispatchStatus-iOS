@@ -45,10 +45,10 @@ struct MapView: View {
                         }
                         if let fireLocation = feature.state.fireLocation {
                             let model = feature.state.fireDispatchModel
-                            Annotation("", coordinate: fireLocation) {
+                            Annotation("(대략적인 위치)", coordinate: fireLocation) {
                                 Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 15, height: 15)
+                                    .fill(Color.red.opacity(0.4))
+                                    .frame(width: 100, height: 100)
                                 Text("\(model.address)")
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundStyle(Color.appText)
